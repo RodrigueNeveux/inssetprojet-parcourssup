@@ -84,6 +84,96 @@ class InssetProjet_Install_Index {
     }
 
     /**
+     * Tables ParcoursSup-like (projet noté LP 2025-2026) :
+     * student, campaign, formation, campaign_formation, student_to_campaign, student_choice (entité/valeur).
+     */
+    private function setup_parcourssup_tables() {
+        global $wpdb;
+        $charset_collate = $wpdb->get_charset_collate();
+        $prefix          = $wpdb->prefix . INSSETPROJET_BASENAME . '_';
+
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+
+        // Étudiant : identifiant type PS + mot de passe hashé
+        $sql = 'CREATE TABLE IF NOT EXISTS `' . $prefix . 'student` (
+            `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+            `login` VARCHAR(100) NOT NULL,
+            `password_hash` VARCHAR(255) NOT NULL,
+            `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (`id`),
+            UNIQUE KEY `login` (`login`)
+        ) ENGINE=InnoDB ' . $charset_collate;
+        dbDelta($sql);
+
+        // Campagne
+        $sql = 'CREATE TABLE IF NOT EXISTS `' . $prefix . 'campaign` (
+            `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+            `name` VARCHAR(255) NOT NULL,
+            `is_active` TINYINT(1) NOT NULL DEFAULT 0,
+            `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (`id`)
+        ) ENGINE=InnoDB ' . $charset_collate;
+        dbDelta($sql);
+
+        // Formation / spécialité
+        $sql = 'CREATE TABLE IF NOT EXISTS `' . $prefix . 'formation` (
+            `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+            `name` VARCHAR(255) NOT NULL,
+            `code` VARCHAR(50) NULL DEFAULT NULL,
+            `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (`id`)
+        ) ENGINE=InnoDB ' . $charset_collate;
+        dbDelta($sql);
+
+        // Liaison campagne ↔ formations (N-N)
+        $sql = 'CREATE TABLE IF NOT EXISTS `' . $prefix . 'campaign_formation` (
+            `campaign_id` INT(11) UNSIGNED NOT NULL,
+            `formation_id` INT(11) UNSIGNED NOT NULL,
+            PRIMARY KEY (`campaign_id`,`formation_id`),
+            KEY `formation_id` (`formation_id`)
+        ) ENGINE=InnoDB ' . $charset_collate;
+        dbDelta($sql);
+
+        // Liaison étudiant ↔ campagne (réponse à une campagne)
+        $sql = 'CREATE TABLE IF NOT EXISTS `' . $prefix . 'student_to_campaign` (
+            `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+            `student_id` INT(11) UNSIGNED NOT NULL,
+            `campaign_id` INT(11) UNSIGNED NOT NULL,
+            `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (`id`),
+            UNIQUE KEY `student_campaign` (`student_id`,`campaign_id`),
+            KEY `campaign_id` (`campaign_id`)
+        ) ENGINE=InnoDB ' . $charset_collate;
+        dbDelta($sql);
+
+        // Choix étudiant : format entité/valeur (extensible, pas limité à 3)
+        $sql = 'CREATE TABLE IF NOT EXISTS `' . $prefix . 'student_choice` (
+            `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+            `student_to_campaign_id` INT(11) UNSIGNED NOT NULL,
+            `choice_key` VARCHAR(64) NOT NULL,
+            `value` VARCHAR(255) NOT NULL,
+            `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (`id`),
+            UNIQUE KEY `student_campaign_key` (`student_to_campaign_id`,`choice_key`),
+            KEY `student_to_campaign_id` (`student_to_campaign_id`)
+        ) ENGINE=InnoDB ' . $charset_collate;
+        dbDelta($sql);
+    }
+
+    /**
+     * Crée les tables ParcoursSup si elles n'existent pas (sans réactiver le plugin).
+     */
+    public static function ensure_parcourssup_tables() {
+        global $wpdb;
+        $prefix = $wpdb->prefix . INSSETPROJET_BASENAME . '_';
+        $table  = $prefix . 'student';
+        if ($wpdb->get_var("SHOW TABLES LIKE '" . $table . "'") !== $table) {
+            $install = new self();
+            $install->setup_parcourssup_tables();
+        }
+    }
+
+    /**
      * Crée la table inscriptions si elle n'existe pas (mise à jour sans réactivation).
      */
     public static function ensure_inscriptions_table() {

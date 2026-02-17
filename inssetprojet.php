@@ -44,6 +44,7 @@ if (!defined('INSSETPROJET_BASENAME')) {
     });
 
     add_action('plugins_loaded', array('InssetProjet_Install_Index', 'ensure_inscriptions_table'));
+    add_action('plugins_loaded', array('InssetProjet_Install_Index', 'ensure_parcourssup_tables'));
 
     register_activation_hook(INSSETPROJET_FILE, function() {
         $InssetProjet_Install_Index = new InssetProjet_Install_Index();
