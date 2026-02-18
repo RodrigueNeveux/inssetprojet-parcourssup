@@ -8,6 +8,7 @@ class InssetProjet_Main_Front {
 
     public function __construct() {
         add_shortcode('TESTPROJETBG', array('InssetProjet_Controller_Front', 'displayForm'));
+        add_shortcode('INSSETPROJET_LOGIN', array('InssetProjet_Shortcode_Login', 'display'));
         add_action('wp_enqueue_scripts', array($this, 'assets'));
     }
 
@@ -18,7 +19,7 @@ class InssetProjet_Main_Front {
             $load_assets = true;
         } elseif (is_singular()) {
             $post = get_post();
-            if ($post && has_shortcode($post->post_content, 'TESTPROJETBG')) {
+            if ($post && (has_shortcode($post->post_content, 'TESTPROJETBG') || has_shortcode($post->post_content, 'INSSETPROJET_LOGIN'))) {
                 $load_assets = true;
             }
         }

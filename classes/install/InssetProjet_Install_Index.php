@@ -158,6 +158,17 @@ class InssetProjet_Install_Index {
             KEY `student_to_campaign_id` (`student_to_campaign_id`)
         ) ENGINE=InnoDB ' . $charset_collate;
         dbDelta($sql);
+
+        // Étudiant de test (login PS / mot de passe "test") si la table est vide
+        $student_table = $prefix . 'student';
+        if ((int) $wpdb->get_var("SELECT COUNT(*) FROM `{$student_table}`") === 0) {
+            $hash = password_hash('test', PASSWORD_DEFAULT);
+            $wpdb->insert(
+                $student_table,
+                array('login' => 'PS', 'password_hash' => $hash),
+                array('%s', '%s')
+            );
+        }
     }
 
     /**

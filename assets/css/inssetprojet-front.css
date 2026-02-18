@@ -168,3 +168,41 @@
 .inssetprojet-confirmation-back {
     margin: 0;
 }
+
+/* Box connexion étudiant ParcoursSup (shortcode INSSETPROJET_LOGIN) */
+.inssetprojet-login-box {
+    max-width: 400px;
+    margin: 1.5rem 0;
+    padding: 1.5rem;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+.inssetprojet-login-box h2 {
+    margin: 0 0 1rem;
+    font-size: 1.25rem;
+}
+.inssetprojet-login-box .inssetprojet-form-login p {
+    margin-bottom: 1rem;
+}
+.inssetprojet-login-box .inssetprojet-form-login label {
+    display: block;
+    margin-bottom: 0.35rem;
+    font-weight: 500;
+}
+.inssetprojet-login-error {
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 4px;
+    color: #721c24;
+}
+.inssetprojet-btn-secondary {
+    background: #6c757d;
+    color: #fff;
+}
+.inssetprojet-btn-secondary:hover {
+    background: #5a6268;
+}

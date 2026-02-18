@@ -54,6 +54,15 @@ if (!defined('INSSETPROJET_BASENAME')) {
 
     InssetProjet_Rewrite_Confirmation::init();
 
+    // Session étudiant ParcoursSup (front)
+    add_action('init', array('InssetProjet_Session_Student', 'maybe_start'), 1);
+
+    // Connexion / déconnexion étudiant (admin-post, avec et sans auth WP)
+    add_action('admin_post_inssetprojet_student_login', array('InssetProjet_Action_Student_Login', 'handle_login'));
+    add_action('admin_post_nopriv_inssetprojet_student_login', array('InssetProjet_Action_Student_Login', 'handle_login'));
+    add_action('admin_post_inssetprojet_student_logout', array('InssetProjet_Action_Student_Login', 'handle_logout'));
+    add_action('admin_post_nopriv_inssetprojet_student_logout', array('InssetProjet_Action_Student_Login', 'handle_logout'));
+
     // AJAX inscription (front) : pour utilisateurs connectés et non connectés
     add_action('wp_ajax_inssetprojet_inscription', array('InssetProjet_Action_Front_Index', 'save_inscription'));
     add_action('wp_ajax_nopriv_inssetprojet_inscription', array('InssetProjet_Action_Front_Index', 'save_inscription'));
